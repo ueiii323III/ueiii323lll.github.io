@@ -1,0 +1,227 @@
+<!--profile.wxml-->
+<navigation-bar title="我的" back="{{true}}" color="white" background="#FF91A4" bindback="handleBack"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 用户头像区域 -->
+    <view class="user-section">
+      <view wx:if="{{userInfo}}" class="user-info">
+        <image class="user-avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+        <text class="user-name">{{userInfo.nickName}}</text>
+      </view>
+      <view wx:else class="login-prompt">
+        <button class="login-btn" bindtap="handleLogin">微信登录</button>
+        <button class="login-btn mock-btn" bindtap="handleMockLogin" style="margin-top: 10px; background: #2196F3;">
+          模拟登录(开发测试)
+        </button>
+      </view>
+    </view>
+
+    <!-- 用户资料编辑区域 -->
+    <view class="profile-section">
+      <view class="section-header">
+        <text class="section-title">基础健康信息</text>
+        <view class="section-actions">
+          <button wx:if="{{!isEditing && userProfile}}" class="refresh-btn-small" bindtap="refreshHealthData">刷新</button>
+          <button wx:if="{{!isEditing && userProfile}}" class="edit-btn" bindtap="toggleEdit">编辑</button>
+        </view>
+      </view>
+      
+      <!-- 查看模式 -->
+      <view wx:if="{{!isEditing && userProfile}}" class="profile-view">
+        <view class="info-grid">
+          <view class="info-item">
+            <text class="info-label">身高</text>
+            <text class="info-value">{{userProfile.height}}cm</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">体重</text>
+            <text class="info-value">{{userProfile.weight}}kg</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">BMI</text>
+            <text class="info-value">{{calculatedBMI > 0 ? calculatedBMI : '--'}} ({{calculatedBMI > 0 ? bmiCategoryText : '--'}})</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">性别</text>
+            <text class="info-value">{{userProfile.gender === 'male' ? '男' : '女'}}</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">年龄</text>
+            <text class="info-value">{{userProfile.age}}岁</text>
+          </view>
+          <view class="info-item">
+            <text class="info-label">活动量</text>
+            <text class="info-value">{{activityLevelLabel}}</text>
+          </view>
+        </view>
+        
+        <view class="goal-section">
+          <text class="info-label">健康目标</text>
+          <text class="goal-text">
+            {{healthGoalLabel}}
+            {{userProfile.otherGoal ? '(' + userProfile.otherGoal + ')' : ''}}
+          </text>
+        </view>
+        
+        <view class="target-weight-section">
+          <text class="info-label">目标体重</text>
+          <text class="target-weight-text">
+            {{userProfile.targetWeight ? userProfile.targetWeight + 'kg' : '--'}}
+          </text>
+        </view>
+      </view>
+      
+      <!-- 编辑模式 -->
+      <view wx:if="{{isEditing}}" class="profile-edit">
+        <view class="form-group">
+          <text class="form-label">身高 (cm)</text>
+          <input class="form-input" type="digit" placeholder="请输入身高" value="{{formData.height}}" bindinput="onHeightInput" />
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">体重 (kg)</text>
+          <input class="form-input" type="digit" placeholder="请输入体重" value="{{formData.weight}}" bindinput="onWeightInput" />
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">性别</text>
+          <radio-group class="radio-group" bindchange="onGenderChange">
+            <label class="radio-item">
+              <radio value="male" checked="{{formData.gender === 'male'}}" color="#4CAF50" />
+              <text>男</text>
+            </label>
+            <label class="radio-item">
+              <radio value="female" checked="{{formData.gender === 'female'}}" color="#4CAF50" />
+              <text>女</text>
+            </label>
+          </radio-group>
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">年龄</text>
+          <input class="form-input" type="number" placeholder="请输入年龄" value="{{formData.age}}" bindinput="onAgeInput" />
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">日常活动量</text>
+          <radio-group class="options-list" bindchange="onActivityLevelChange">
+            <view wx:for="{{activityLevelOptions}}" wx:key="value" class="option-item">
+              <label class="option-label">
+                <radio value="{{item.value}}" checked="{{formData.activityLevel === item.value}}" color="#4CAF50" />
+                <view class="option-content">
+                  <text class="option-title">{{item.label}}</text>
+                  <text class="option-desc">{{item.desc}}</text>
+                </view>
+              </label>
+            </view>
+          </radio-group>
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">健康目标</text>
+          <radio-group class="options-list" bindchange="onHealthGoalChange">
+            <view wx:for="{{healthGoalOptions}}" wx:key="value" class="option-item">
+              <label class="option-label">
+                <radio value="{{item.value}}" checked="{{formData.healthGoal === item.value}}" color="#4CAF50" />
+                <view class="option-content">
+                  <text class="option-title">{{item.label}}</text>
+                  <text class="option-desc">{{item.desc}}</text>
+                </view>
+              </label>
+            </view>
+          </radio-group>
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">目标体重 (kg)</text>
+          <input class="form-input" type="digit" placeholder="请输入目标体重" value="{{formData.targetWeight}}" bindinput="onTargetWeightInput" />
+        </view>
+        
+        <view wx:if="{{formData.healthGoal === 'other'}}" class="form-group">
+          <text class="form-label">其他目标描述</text>
+          <input class="form-input" placeholder="请描述您的健康目标" value="{{formData.otherGoal}}" bindinput="onOtherGoalInput" />
+        </view>
+        
+        <!-- 计算结果预览 -->
+        <view wx:if="{{calculatedBMI > 0}}" class="calculation-result">
+          <view class="result-item">
+            <text class="result-label">计算结果</text>
+          </view>
+          <view class="result-item">
+            <text class="result-text">BMI: {{calculatedBMI}} ({{bmiCategoryText}})</text>
+          </view>
+          <view class="result-item">
+            <text class="result-text">目标体重: {{formData.targetWeight || formData.weight}} kg</text>
+          </view>
+        </view>
+        
+        <view class="form-actions">
+          <button class="cancel-btn" bindtap="cancelEdit">取消</button>
+          <button class="save-btn" bindtap="saveProfile">保存</button>
+        </view>
+      </view>
+      
+      <!-- 未完善信息提示 -->
+      <view wx:if="{{!userProfile && !isEditing}}" class="empty-profile">
+        <view class="empty-icon">📝</view>
+        <text class="empty-text">请完善您的基础健康信息</text>
+        <button class="complete-profile-btn" bindtap="toggleEdit">完善信息</button>
+      </view>
+    </view>
+
+    <!-- 健康目标区域 -->
+    <view wx:if="{{healthGoals}}" class="goals-section">
+      <view class="section-title">健康目标</view>
+      <view class="goals-grid">
+        <view class="goal-item">
+          <text class="goal-icon">💧</text>
+          <text class="goal-value">{{healthGoals.dailyWaterIntake}}ml</text>
+          <text class="goal-label">每日饮水</text>
+        </view>
+        <view class="goal-item">
+          <text class="goal-icon">🔥</text>
+          <text class="goal-value">{{healthGoals.dailyCalorieMin}}-{{healthGoals.dailyCalorieMax}}kcal</text>
+          <text class="goal-label">每日热量</text>
+        </view>
+        <view class="goal-item">
+          <text class="goal-icon">🏃</text>
+          <text class="goal-value">{{healthGoals.dailyExerciseDuration}}min</text>
+          <text class="goal-label">每日运动</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 功能菜单 -->
+    <view class="menu-section">
+      <view class="menu-item" bindtap="navigateToData">
+        <view class="menu-icon">📊</view>
+        <text class="menu-text">数据中心</text>
+        <text class="menu-arrow">></text>
+      </view>
+      
+      <view class="menu-item" bindtap="navigateToSettings">
+        <view class="menu-icon">⚙️</view>
+        <text class="menu-text">提醒设置</text>
+        <text class="menu-arrow">></text>
+      </view>
+      
+      <view class="menu-item" bindtap="exportData">
+        <view class="menu-icon">📤</view>
+        <text class="menu-text">数据导出</text>
+        <text class="menu-arrow">></text>
+      </view>
+      
+      <view class="menu-item" bindtap="clearData">
+        <view class="menu-icon">🗑️</view>
+        <text class="menu-text">清理数据</text>
+        <text class="menu-arrow">></text>
+      </view>
+      
+      <view class="menu-item" bindtap="showAbout">
+        <view class="menu-icon">ℹ️</view>
+        <text class="menu-text">关于应用</text>
+        <text class="menu-arrow">></text>
+      </view>
+    </view>
+  </view>
+</scroll-view>

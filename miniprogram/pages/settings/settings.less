@@ -1,0 +1,289 @@
+/**settings.less**/
+page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 750rpx;
+  height: auto;
+  min-height: 100vh;
+  padding: 10rpx 20rpx 80rpx;
+  box-sizing: border-box;
+  margin: 0 auto;
+  overflow-x: hidden;
+}
+
+.scrollarea {
+  flex: 1;
+  width: 100%;
+  height: calc(100vh - 44px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 0;
+}
+
+/* 提醒设置区域 */
+.reminder-section {
+  margin: 15rpx;
+  background-color: white;
+  border-radius: 20rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.05);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.section-info {
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+}
+
+.section-icon {
+  font-size: 32rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.reminder-switch {
+  transform: scale(0.8);
+}
+
+.reminder-content {
+  padding: 20rpx 30rpx 30rpx;
+}
+
+/* 时间列表 */
+.times-list {
+  margin-bottom: 20rpx;
+}
+
+.time-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx;
+  border-radius: 15rpx;
+  background-color: #f8f9fa;
+  margin-bottom: 15rpx;
+}
+
+.time-text {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.time-actions {
+  display: flex;
+  gap: 10rpx;
+}
+
+.action-btn {
+  padding: 8rpx 16rpx;
+  border-radius: 10rpx;
+  font-size: 24rpx;
+  border: none;
+  line-height: 1;
+}
+
+.action-btn::after {
+  border: none;
+}
+
+.edit-btn {
+  background-color: #E3F2FD;
+  color: #2196F3;
+}
+
+.delete-btn {
+  background-color: #FFEBEE;
+  color: #f44336;
+}
+
+/* 添加时间按钮 */
+.add-time-btn {
+  width: 100%;
+  padding: 20rpx;
+  border: 2rpx dashed #e0e0e0;
+  border-radius: 15rpx;
+  background-color: #f8f9fa;
+  color: #666;
+  font-size: 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.add-time-btn::after {
+  border: none;
+}
+
+/* 测试按钮 */
+.test-btn {
+  width: 100%;
+  padding: 20rpx;
+  background-color: #F3E5F5;
+  color: #9C27B0;
+  border-radius: 15rpx;
+  font-size: 26rpx;
+  border: none;
+}
+
+.test-btn::after {
+  border: none;
+}
+
+/* 使用说明 */
+.help-section {
+  margin: 15rpx;
+  background-color: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.05);
+}
+
+.help-section .section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.help-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.help-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15rpx;
+}
+
+.help-icon {
+  font-size: 28rpx;
+  margin-top: 3rpx;
+}
+
+.help-text {
+  flex: 1;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* 时间设置弹窗 */
+.time-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  position: relative;
+  background-color: white;
+  border-radius: 20rpx;
+  width: 80%;
+  max-width: 500rpx;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  text-align: center;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.modal-body {
+  padding: 30rpx;
+}
+
+.time-input {
+  width: 100%;
+  padding: 25rpx 20rpx;
+  height: 80rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 15rpx;
+  font-size: 28rpx;
+  background-color: white;
+  box-sizing: border-box;
+  text-align: center;
+  margin-bottom: 15rpx;
+  line-height: 1.4;
+}
+
+.time-input:focus {
+  border-color: #FF5722;
+}
+
+.time-hint {
+  font-size: 24rpx;
+  color: #999;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 25rpx;
+  font-size: 28rpx;
+  border: none;
+  background-color: transparent;
+}
+
+.modal-btn::after {
+  border: none;
+}
+
+.cancel-btn {
+  color: #666;
+  border-right: 1rpx solid #f0f0f0;
+}
+
+.confirm-btn {
+  color: #FF5722;
+  font-weight: bold;
+}

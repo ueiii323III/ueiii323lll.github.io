@@ -1,0 +1,147 @@
+<!--water.wxml-->
+<navigation-bar title="饮水打卡" back="{{true}}" color="white" background="#2196F3"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 今日统计 -->
+    <view class="stats-section">
+      <view class="progress-circle">
+        <view class="circle-bg">
+          <view class="circle-progress" style="background: conic-gradient(#2196F3 {{progress * 3.6}}deg, #e0e0e0 0deg);">
+            <view class="circle-inner">
+              <text class="progress-text">{{progress}}%</text>
+              <text class="progress-label">已完成</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <view class="stats-info">
+        <view class="stat-item">
+          <text class="stat-value">{{totalAmount}}</text>
+          <text class="stat-unit">ml</text>
+          <text class="stat-label">今日饮水</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-value">{{targetAmount}}</text>
+          <text class="stat-unit">ml</text>
+          <text class="stat-label">目标水量</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 快捷记录 -->
+    <view class="quick-record-section">
+      <view class="section-title">快速记录</view>
+      
+      <!-- 快捷金额选择 -->
+      <view class="quick-amounts">
+        <view wx:for="{{quickAmounts}}" wx:key="*this" 
+              class="quick-amount-item {{customAmount == item ? 'selected' : ''}}" 
+              bindtap="selectQuickAmount" 
+              data-amount="{{item}}">
+          <text class="amount-value">{{item}}</text>
+          <text class="amount-unit">ml</text>
+        </view>
+      </view>
+      
+      <!-- 自定义输入 -->
+      <view class="custom-input">
+        <input class="amount-input" 
+               type="digit" 
+               placeholder="自定义饮水量" 
+               value="{{customAmount}}" 
+               bindinput="onCustomAmountInput" />
+        <text class="input-unit">ml</text>
+      </view>
+      
+      <!-- 时间选择 -->
+      <view class="time-selector">
+        <text class="time-label">记录时间</text>
+        <view class="time-picker-wrapper">
+          <picker mode="time" value="{{selectedTime}}" bindchange="onTimeChange">
+            <view class="time-picker">
+              <text class="time-text">{{selectedTime}}</text>
+              <text class="time-arrow">🕒</text>
+            </view>
+          </picker>
+        </view>
+      </view>
+      
+      <!-- 提交按钮 -->
+      <button class="submit-btn" bindtap="addWaterRecord">
+        💧 记录饮水
+      </button>
+    </view>
+
+    <!-- 今日记录 -->
+    <view class="records-section">
+      <view class="section-title">
+        <text>今日记录</text>
+        <text class="record-count">{{todayRecords.length}}条</text>
+      </view>
+      
+      <view wx:if="{{todayRecords.length === 0}}" class="empty-records">
+        <view class="empty-icon">💧</view>
+        <text class="empty-text">今日还没有饮水记录</text>
+        <text class="empty-desc">点击上方快速记录开始打卡</text>
+      </view>
+      
+      <view wx:else class="records-list">
+        <view wx:for="{{todayRecords}}" wx:key="id" class="record-item">
+          <view class="record-content">
+            <view class="record-icon">💧</view>
+            <view class="record-info">
+              <text class="record-amount">{{item.amount}}ml</text>
+              <text class="record-time">{{item.time}}</text>
+            </view>
+          </view>
+          <view class="record-actions">
+            <text class="record-created">{{formatDateTime(item.createdAt)}}</text>
+            <view class="delete-btn" bindtap="showDeleteConfirm" data-record="{{item}}">
+              🗑️
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 健康提示 -->
+    <view class="tips-section">
+      <view class="section-title">健康小贴士</view>
+      <view class="tips-list">
+        <view class="tip-item">
+          <text class="tip-icon">💡</text>
+          <text class="tip-text">建议每日饮水量为体重的30-35倍(ml)</text>
+        </view>
+        <view class="tip-item">
+          <text class="tip-icon">💡</text>
+          <text class="tip-text">早起一杯水，有助于唤醒身体机能</text>
+        </view>
+        <view class="tip-item">
+          <text class="tip-icon">💡</text>
+          <text class="tip-text">运动后及时补充水分，维持身体平衡</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</scroll-view>
+
+<!-- 删除确认弹窗 -->
+<view wx:if="{{showDeleteConfirm}}" class="delete-modal">
+  <view class="modal-overlay" bindtap="hideDeleteConfirm"></view>
+  <view class="modal-content">
+    <view class="modal-header">
+      <text class="modal-title">确认删除</text>
+    </view>
+    <view class="modal-body">
+      <text class="modal-message">确定要删除这条饮水记录吗？</text>
+      <text wx:if="{{recordToDelete}}" class="modal-detail">
+        {{recordToDelete.amount}}ml - {{recordToDelete.time}}
+      </text>
+    </view>
+    <view class="modal-actions">
+      <button class="modal-btn cancel-btn" bindtap="hideDeleteConfirm">取消</button>
+      <button class="modal-btn confirm-btn" bindtap="confirmDelete">删除</button>
+    </view>
+  </view>
+</view>

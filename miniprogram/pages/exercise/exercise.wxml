@@ -1,0 +1,204 @@
+<!--exercise.wxml-->
+<navigation-bar title="运动打卡" back="{{true}}" color="white" background="#4CAF50"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 今日统计 -->
+    <view class="stats-section">
+      <view class="exercise-stats">
+        <view class="duration-circle">
+          <view class="circle-bg">
+            <view class="circle-progress" style="background: conic-gradient(#4CAF50 {{durationProgress * 3.6}}deg, #e0e0e0 0deg);">
+              <view class="circle-inner">
+                <text class="duration-value">{{totalDuration}}</text>
+                <text class="duration-unit">分钟</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <view class="stats-info">
+          <view class="stat-item">
+            <text class="stat-value">{{totalDuration}}</text>
+            <text class="stat-label">今日运动(分钟)</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-value">{{totalCalories}}</text>
+            <text class="stat-label">消耗热量(kcal)</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-value">{{targetDuration}}</text>
+            <text class="stat-label">目标时长(分钟)</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 记录表单 -->
+    <view class="form-section">
+      <view class="section-title">记录运动</view>
+      
+      <!-- 运动类型 -->
+      <view class="form-group">
+        <text class="form-label">运动类型</text>
+        <picker mode="selector" range="{{exerciseTypes}}" bindchange="onExerciseTypeChange">
+          <view class="picker">
+            <text class="picker-text">{{exerciseType || '请选择运动类型'}}</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+      
+      <!-- 运动时长 -->
+      <view class="form-group">
+        <text class="form-label">运动时长</text>
+        <view class="duration-input-wrapper">
+          <input class="duration-input" 
+                 type="digit" 
+                 placeholder="请输入运动时长" 
+                 value="{{duration}}" 
+                 bindinput="onDurationInput" />
+          <text class="unit-text">分钟</text>
+        </view>
+        
+        <!-- 热量计算结果 -->
+        <view wx:if="{{showCalculatedResult}}" class="calorie-result">
+          <text class="calorie-text">预计消耗 {{calculatedCalories}} kcal</text>
+        </view>
+      </view>
+      
+      <!-- 运动强度 -->
+      <view class="form-group">
+        <text class="form-label">运动强度</text>
+        <view class="intensity-options">
+          <view wx:for="{{intensityOptions}}" wx:key="value" 
+                class="intensity-item {{intensity === item.value ? 'selected' : ''}}"
+                bindtap="onIntensityChange"
+                data-value="{{item.value}}">
+            <text class="intensity-title">{{item.label}}</text>
+            <text class="intensity-desc">{{item.desc}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 时间选择 -->
+      <view class="form-group">
+        <text class="form-label">运动时间</text>
+        <picker mode="time" value="{{selectedTime}}" bindchange="onTimeChange">
+          <view class="time-picker">
+            <text class="time-text">{{selectedTime}}</text>
+            <text class="time-arrow">🕒</text>
+          </view>
+        </picker>
+      </view>
+      
+      <!-- 照片上传 -->
+      <view class="form-group">
+        <text class="form-label">照片（可选）</text>
+        <view class="photo-section">
+          <view wx:if="{{photo}}" class="photo-preview">
+            <image src="{{photo}}" mode="aspectFill" class="preview-image"></image>
+            <view class="photo-delete" bindtap="chooseImage">
+              <text>重新选择</text>
+            </view>
+          </view>
+          <view wx:else class="photo-upload" bindtap="chooseImage">
+            <text class="upload-icon">📷</text>
+            <text class="upload-text">添加照片</text>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 提交按钮 -->
+      <button class="submit-btn" bindtap="addExerciseRecord">
+        🏃 记录运动
+      </button>
+    </view>
+
+    <!-- 今日记录 -->
+    <view class="records-section">
+      <view class="section-title">
+        <text>今日记录</text>
+        <text class="record-count">{{todayRecords.length}}条</text>
+      </view>
+      
+      <view wx:if="{{todayRecords.length === 0}}" class="empty-records">
+        <view class="empty-icon">🏃</view>
+        <text class="empty-text">今日还没有运动记录</text>
+        <text class="empty-desc">点击上方开始记录您的运动</text>
+      </view>
+      
+      <view wx:else class="records-list">
+        <view wx:for="{{todayRecords}}" wx:key="id" class="record-item">
+          <view class="record-header">
+            <view class="exercise-info">
+              <text class="exercise-type">{{item.exerciseType}}</text>
+              <text class="exercise-intensity">{{getIntensityText(item.intensity)}}</text>
+            </view>
+            <text class="record-time">{{item.time}}</text>
+          </view>
+          
+          <view class="record-content">
+            <view class="duration-info">
+              <text class="duration">{{item.duration}}分钟</text>
+              <text class="calories">消耗 {{item.calories}} kcal</text>
+            </view>
+          </view>
+          
+          <view wx:if="{{item.photo}}" class="record-photo">
+            <image src="{{item.photo}}" mode="aspectFill" class="exercise-photo"></image>
+          </view>
+          
+          <view class="record-footer">
+            <text class="record-created">{{formatDateTime(item.createdAt)}}</text>
+            <view class="delete-btn" bindtap="showDeleteConfirm" data-record="{{item}}">
+              🗑️
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 运动建议 -->
+    <view class="tips-section">
+      <view class="section-title">运动建议</view>
+      <view class="tips-list">
+        <view class="tip-item">
+          <text class="tip-icon">💡</text>
+          <text class="tip-text">建议每周至少进行150分钟中等强度有氧运动</text>
+        </view>
+        <view class="tip-item">
+          <text class="tip-icon">💡</text>
+          <text class="tip-text">运动前要充分热身，避免运动损伤</text>
+        </view>
+        <view class="tip-item">
+          <text class="tip-icon">💡</text>
+          <text class="tip-text">运动后要适当拉伸，有助于肌肉恢复</text>
+        </view>
+        <view class="tip-item">
+          <text class="tip-icon">💡</text>
+          <text class="tip-text">循序渐进，逐步增加运动强度和时长</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</scroll-view>
+
+<!-- 删除确认弹窗 -->
+<view wx:if="{{showDeleteConfirm}}" class="delete-modal">
+  <view class="modal-overlay" bindtap="hideDeleteConfirm"></view>
+  <view class="modal-content">
+    <view class="modal-header">
+      <text class="modal-title">确认删除</text>
+    </view>
+    <view class="modal-body">
+      <text class="modal-message">确定要删除这条运动记录吗？</text>
+      <text wx:if="{{recordToDelete}}" class="modal-detail">
+        {{recordToDelete.exerciseType}} - {{recordToDelete.duration}}分钟
+      </text>
+    </view>
+    <view class="modal-actions">
+      <button class="modal-btn cancel-btn" bindtap="hideDeleteConfirm">取消</button>
+      <button class="modal-btn confirm-btn" bindtap="confirmDelete">删除</button>
+    </view>
+  </view>
+</view>

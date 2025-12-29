@@ -1,0 +1,193 @@
+<!--settings.wxml-->
+<navigation-bar title="提醒设置" back="{{true}}" color="white" background="#FF5722"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 饮水提醒 -->
+    <view class="reminder-section">
+      <view class="section-header">
+        <view class="section-info">
+          <text class="section-icon">💧</text>
+          <text class="section-title">饮水提醒</text>
+        </view>
+        <switch class="reminder-switch" 
+                checked="{{waterEnabled}}" 
+                bindchange="onWaterEnabledChange" 
+                color="#2196F3" />
+      </view>
+      
+      <view wx:if="{{waterEnabled}}" class="reminder-content">
+        <view class="times-list">
+          <view wx:for="{{waterTimes}}" wx:key="*this" class="time-item">
+            <text class="time-text">{{item}}</text>
+            <view class="time-actions">
+              <button class="action-btn edit-btn" bindtap="editWaterTime" data-index="{{index}}">编辑</button>
+              <button class="action-btn delete-btn" bindtap="deleteWaterTime" data-index="{{index}}">删除</button>
+            </view>
+          </view>
+        </view>
+        
+        <button wx:if="{{waterTimes.length < 5}}" 
+                class="add-time-btn" 
+                bindtap="showAddWaterTime">
+          + 添加提醒时间
+        </button>
+        
+        <button class="test-btn" bindtap="testReminder" data-type="water">
+          测试提醒
+        </button>
+      </view>
+    </view>
+
+    <!-- 饮食提醒 -->
+    <view class="reminder-section">
+      <view class="section-header">
+        <view class="section-info">
+          <text class="section-icon">🍽️</text>
+          <text class="section-title">饮食提醒</text>
+        </view>
+        <switch class="reminder-switch" 
+                checked="{{foodEnabled}}" 
+                bindchange="onFoodEnabledChange" 
+                color="#FF9800" />
+      </view>
+      
+      <view wx:if="{{foodEnabled}}" class="reminder-content">
+        <view class="times-list">
+          <view wx:for="{{foodTimes}}" wx:key="*this" class="time-item">
+            <text class="time-text">{{item}}</text>
+            <view class="time-actions">
+              <button class="action-btn edit-btn" bindtap="editFoodTime" data-index="{{index}}">编辑</button>
+              <button class="action-btn delete-btn" bindtap="deleteFoodTime" data-index="{{index}}">删除</button>
+            </view>
+          </view>
+        </view>
+        
+        <button wx:if="{{foodTimes.length < 5}}" 
+                class="add-time-btn" 
+                bindtap="showAddFoodTime">
+          + 添加提醒时间
+        </button>
+        
+        <button class="test-btn" bindtap="testReminder" data-type="food">
+          测试提醒
+        </button>
+      </view>
+    </view>
+
+    <!-- 运动提醒 -->
+    <view class="reminder-section">
+      <view class="section-header">
+        <view class="section-info">
+          <text class="section-icon">🏃</text>
+          <text class="section-title">运动提醒</text>
+        </view>
+        <switch class="reminder-switch" 
+                checked="{{exerciseEnabled}}" 
+                bindchange="onExerciseEnabledChange" 
+                color="#4CAF50" />
+      </view>
+      
+      <view wx:if="{{exerciseEnabled}}" class="reminder-content">
+        <view class="time-item">
+          <text class="time-text">{{exerciseTime}}</text>
+          <view class="time-actions">
+            <button class="action-btn edit-btn" bindtap="showExerciseTimeModal">编辑</button>
+          </view>
+        </view>
+        
+        <button class="test-btn" bindtap="testReminder" data-type="exercise">
+          测试提醒
+        </button>
+      </view>
+    </view>
+
+    <!-- 使用说明 -->
+    <view class="help-section">
+      <view class="section-title">使用说明</view>
+      <view class="help-content">
+        <view class="help-item">
+          <text class="help-icon">📱</text>
+          <text class="help-text">开启提醒后，系统会在设定时间发送通知</text>
+        </view>
+        <view class="help-item">
+          <text class="help-icon">⏰</text>
+          <text class="help-text">请确保已授权接收消息通知</text>
+        </view>
+        <view class="help-item">
+          <text class="help-icon">🔄</text>
+          <text class="help-text">每日自动重置，无需重复设置</text>
+        </view>
+        <view class="help-item">
+          <text class="help-icon">🔕</text>
+          <text class="help-text">如需关闭，可直接关闭对应开关</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</scroll-view>
+
+<!-- 饮水时间设置弹窗 -->
+<view wx:if="{{showWaterTimeModal}}" class="time-modal">
+  <view class="modal-overlay" bindtap="cancelWaterTime"></view>
+  <view class="modal-content">
+    <view class="modal-header">
+      <text class="modal-title">{{editingWaterIndex >= 0 ? '编辑' : '添加'}}饮水提醒时间</text>
+    </view>
+    <view class="modal-body">
+      <input class="time-input" 
+             type="text" 
+             placeholder="请输入时间，如：10:00" 
+             value="{{newWaterTime}}" 
+             bindinput="onWaterTimeInput" />
+      <text class="time-hint">时间格式：小时:分钟（24小时制）</text>
+    </view>
+    <view class="modal-actions">
+      <button class="modal-btn cancel-btn" bindtap="cancelWaterTime">取消</button>
+      <button class="modal-btn confirm-btn" bindtap="confirmWaterTime">确认</button>
+    </view>
+  </view>
+</view>
+
+<!-- 饮食时间设置弹窗 -->
+<view wx:if="{{showFoodTimeModal}}" class="time-modal">
+  <view class="modal-overlay" bindtap="cancelFoodTime"></view>
+  <view class="modal-content">
+    <view class="modal-header">
+      <text class="modal-title">{{editingFoodIndex >= 0 ? '编辑' : '添加'}}饮食提醒时间</text>
+    </view>
+    <view class="modal-body">
+      <input class="time-input" 
+             type="text" 
+             placeholder="请输入时间，如：12:00" 
+             value="{{newFoodTime}}" 
+             bindinput="onFoodTimeInput" />
+      <text class="time-hint">时间格式：小时:分钟（24小时制）</text>
+    </view>
+    <view class="modal-actions">
+      <button class="modal-btn cancel-btn" bindtap="cancelFoodTime">取消</button>
+      <button class="modal-btn confirm-btn" bindtap="confirmFoodTime">确认</button>
+    </view>
+  </view>
+</view>
+
+<!-- 运动时间设置弹窗 -->
+<view wx:if="{{showExerciseTimeModal}}" class="time-modal">
+  <view class="modal-overlay" bindtap="cancelExerciseTime"></view>
+  <view class="modal-content">
+    <view class="modal-header">
+      <text class="modal-title">编辑运动提醒时间</text>
+    </view>
+    <view class="modal-body">
+      <input class="time-input" 
+             type="text" 
+             placeholder="请输入时间，如：20:00" 
+             value="{{newExerciseTime}}" 
+             bindinput="onExerciseTimeInput" />
+      <text class="time-hint">时间格式：小时:分钟（24小时制）</text>
+    </view>
+    <view class="modal-actions">
+      <button class="modal-btn cancel-btn" bindtap="cancelExerciseTime">取消</button>
+      <button class="modal-btn confirm-btn" bindtap="confirmExerciseTime">确认</button>
+    </view>
+  </view>
+</view>

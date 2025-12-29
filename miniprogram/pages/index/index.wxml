@@ -1,0 +1,147 @@
+<!--index.wxml-->
+<navigation-bar title="健康打卡" back="{{false}}" color="white" background="#FF91A4"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 未登录状态 -->
+    <view wx:if="{{!hasUserInfo}}" class="login-section">
+      <view class="login-content">
+        <view class="app-logo">🏃‍♂️</view>
+        <text class="app-title">健康习惯打卡</text>
+        <text class="app-desc">记录每一天，成就更健康的自己</text>
+        <button class="login-btn" bindtap="handleLogin">
+          <text class="wx-icon">👤</text>
+          微信快速登录
+        </button>
+        <button class="login-btn mock-btn" bindtap="handleMockLogin" style="margin-top: 10px; background: #2196F3;">
+          <text class="wx-icon">🧪</text>
+          模拟登录(开发测试)
+        </button>
+      </view>
+    </view>
+
+    <!-- 已登录但未完善信息 -->
+    <view wx:elif="{{!isProfileComplete}}" class="profile-prompt">
+      <view class="prompt-content">
+        <view class="prompt-icon">📝</view>
+        <text class="prompt-text">请完善您的基础健康信息</text>
+        <text class="prompt-desc">我们将为您生成个性化的健康目标和建议</text>
+        <button class="complete-btn" bindtap="navigateToProfile">完善信息</button>
+      </view>
+    </view>
+
+    <!-- 已完善信息 -->
+    <view wx:else class="main-content">
+      <!-- 用户信息头部 -->
+      <view class="user-header">
+        <image class="user-avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+        <view class="user-info">
+          <text class="user-name">{{userInfo.nickName}}</text>
+          <text class="user-bmi">BMI: {{userProfile.bmi || '--'}} ({{userProfile.bmiCategory === 'normal' ? '正常' : userProfile.bmiCategory === 'underweight' ? '偏瘦' : userProfile.bmiCategory === 'overweight' ? '超重' : userProfile.bmiCategory === 'obese' ? '肥胖' : '未知'}})</text>
+        </view>
+        <view class="today-complete">
+          <text class="complete-text">{{todayStats.completedTasks}}/{{todayStats.totalTasks}}</text>
+          <text class="complete-label">今日完成</text>
+        </view>
+      </view>
+
+      <!-- 今日统计 -->
+      <view class="stats-section">
+        <view class="section-title">今日进度</view>
+        <view class="stats-grid">
+          <view class="stat-item" bindtap="navigateToWater">
+            <view class="stat-icon water-icon">💧</view>
+            <text class="stat-value">{{todayStats.waterAmount}}ml</text>
+            <text class="stat-label">饮水</text>
+            <view class="progress-bar">
+              <view class="progress-fill water-fill" style="width: {{todayStats.waterProgress}}%"></view>
+            </view>
+          </view>
+          
+          <view class="stat-item" bindtap="navigateToFood">
+            <view class="stat-icon food-icon">🍽️</view>
+            <text class="stat-value">{{todayStats.calorieIntake}}kcal</text>
+            <text class="stat-label">饮食</text>
+            <view class="progress-bar">
+              <view class="progress-fill food-fill" style="width: {{todayStats.calorieProgress}}%"></view>
+            </view>
+          </view>
+          
+          <view class="stat-item" bindtap="navigateToExercise">
+            <view class="stat-icon exercise-icon">🏃</view>
+            <text class="stat-value">{{todayStats.exerciseDuration}}min</text>
+            <text class="stat-label">运动</text>
+            <view class="progress-bar">
+              <view class="progress-fill exercise-fill" style="width: {{todayStats.exerciseProgress}}%"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 快速记录 -->
+      <view class="quick-record">
+        <view class="section-title">快速记录</view>
+        <view class="record-grid">
+          <view class="record-item">
+            <text class="record-label">饮水 (ml)</text>
+            <view class="record-input-group">
+              <input class="record-input" type="digit" placeholder="请输入饮水量" value="{{quickRecord.water}}" bindinput="onQuickWaterInput" />
+              <button class="record-btn water-record-btn" bindtap="quickRecordWater">记录</button>
+            </view>
+          </view>
+          
+          <view class="record-item">
+            <text class="record-label">运动 (分钟)</text>
+            <view class="record-input-group">
+              <input class="record-input" type="digit" placeholder="请输入运动时长" value="{{quickRecord.exercise}}" bindinput="onQuickExerciseInput" />
+              <button class="record-btn exercise-record-btn" bindtap="quickRecordExercise">记录</button>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 快捷打卡 -->
+      <view class="quick-actions">
+        <view class="section-header">
+          <text class="section-title">详细记录</text>
+          <button class="refresh-btn" bindtap="forceRefreshData">刷新</button>
+        </view>
+        <view class="action-grid">
+          <button class="action-btn water-btn" bindtap="navigateToWater">
+            <view class="btn-icon">💧</view>
+            <text class="btn-text">饮水记录</text>
+          </button>
+          
+          <button class="action-btn food-btn" bindtap="navigateToFood">
+            <view class="btn-icon">🍽️</view>
+            <text class="btn-text">饮食记录</text>
+          </button>
+          
+          <button class="action-btn exercise-btn" bindtap="navigateToExercise">
+            <view class="btn-icon">🏃</view>
+            <text class="btn-text">运动记录</text>
+          </button>
+        </view>
+      </view>
+
+      <!-- 健康建议 -->
+      <view wx:if="{{healthAdvices.length > 0}}" class="advice-section">
+        <view class="section-title">今日建议</view>
+        <view class="advice-list">
+          <view wx:for="{{healthAdvices}}" wx:key="index" class="advice-item">
+            <view class="advice-icon">💡</view>
+            <text class="advice-text">{{item}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 调试面板(开发环境) -->
+    <view class="debug-panel">
+      <text class="debug-title">调试信息</text>
+      <text class="debug-info">hasUserInfo: {{hasUserInfo}}</text>
+      <text class="debug-info">isProfileComplete: {{isProfileComplete}}</text>
+      <text class="debug-info">userInfo: {{userInfo ? '有数据' : '无数据'}}</text>
+      <text class="debug-info">userProfile: {{userProfile ? '有数据' : '无数据'}}</text>
+    </view>
+  </view>
+</scroll-view>

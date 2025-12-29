@@ -1,0 +1,177 @@
+<!--data.wxml-->
+<navigation-bar title="数据中心" back="{{true}}" color="white" background="#FF91A4" bindback="handleBack"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 未登录提示 -->
+    <view wx:if="{{!userProfile}}" class="no-data-section">
+      <view class="no-data-icon">📊</view>
+      <text class="no-data-text">请先登录并完善健康信息</text>
+      <text class="no-data-desc">完成基础信息设置后即可查看数据分析</text>
+      <button class="action-btn" bindtap="goToProfile">去完善信息</button>
+    </view>
+    
+    <!-- 已登录显示内容 -->
+    <view wx:else>
+      <!-- 时间范围选择 -->
+      <view class="time-range-section">
+      <view class="range-tabs">
+        <view class="range-item {{timeRange === 'today' ? 'active' : ''}}" 
+              bindtap="onTimeRangeChange" 
+              data-range="today">
+          <text class="range-text">今日</text>
+        </view>
+        <view class="range-item {{timeRange === 'week' ? 'active' : ''}}" 
+              bindtap="onTimeRangeChange" 
+              data-range="week">
+          <text class="range-text">最近7天</text>
+        </view>
+        <view class="range-item {{timeRange === 'month' ? 'active' : ''}}" 
+              bindtap="onTimeRangeChange" 
+              data-range="month">
+          <text class="range-text">最近30天</text>
+        </view>
+      </view>
+      <text class="date-range">{{timeRange === 'today' ? '今日' : (startDate + ' - ' + endDate)}}</text>
+    </view>
+
+    <!-- 统计概览 -->
+    <view class="overview-section">
+      <view class="overview-title">{{timeRange === 'today' ? '今日' : (timeRange === 'week' ? '本周' : '本月')}}健康概览</view>
+      
+      <view class="stats-grid">
+        <view class="stat-card water-card">
+          <view class="stat-icon">💧</view>
+          <text class="stat-value">{{timeRange === 'today' ? todayStats.waterAmount : (timeRange === 'week' ? weeklyStats.totalWater : monthlyStats.totalWater)}}</text>
+          <text class="stat-unit">ml</text>
+          <text class="stat-label">总饮水量</text>
+        </view>
+        
+        <view class="stat-card calorie-card">
+          <view class="stat-icon">🔥</view>
+          <text class="stat-value">{{timeRange === 'today' ? todayStats.calorieIntake : (timeRange === 'week' ? weeklyStats.totalCalories : monthlyStats.totalCalories)}}</text>
+          <text class="stat-unit">kcal</text>
+          <text class="stat-label">总热量摄入</text>
+        </view>
+        
+        <view class="stat-card exercise-card">
+          <view class="stat-icon">🏃</view>
+          <text class="stat-value">{{timeRange === 'today' ? todayStats.exerciseDuration : (timeRange === 'week' ? weeklyStats.totalExercise : monthlyStats.totalExercise)}}</text>
+          <text class="stat-unit">分钟</text>
+          <text class="stat-label">总运动时长</text>
+        </view>
+        
+        <view class="stat-card completion-card">
+          <view class="stat-icon">✅</view>
+          <text class="stat-value">{{timeRange === 'today' ? '实时' : (timeRange === 'week' ? weeklyCompletionRate : monthlyCompletionRate)}}%</text>
+          <text class="stat-unit">完成率</text>
+          <text class="stat-label">{{timeRange === 'today' ? '今日' : (timeRange === 'week' ? weeklyStats.completedDays : monthlyStats.completedDays)}}/{{timeRange === 'today' ? '3' : (timeRange === 'week' ? weeklyStats.totalDays : monthlyStats.totalDays)}}天</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 每日数据详情 -->
+    <view class="daily-data-section">
+      <view class="section-title">每日详情</view>
+      
+      <view class="daily-list">
+        <view wx:for="{{dailyData}}" wx:key="date" class="daily-item {{item.completed ? 'completed' : ''}}">
+          <view class="daily-date">
+            <text class="date-text">{{item.date}}</text>
+            <view wx:if="{{item.completed}}" class="completed-badge">✅</view>
+          </view>
+          
+          <view class="daily-stats">
+            <view class="mini-stat">
+              <text class="mini-icon">💧</text>
+              <text class="mini-value">{{item.water}}</text>
+            </view>
+            <view class="mini-stat">
+              <text class="mini-icon">🔥</text>
+              <text class="mini-value">{{item.calories}}</text>
+            </view>
+            <view class="mini-stat">
+              <text class="mini-icon">🏃</text>
+              <text class="mini-value">{{item.exercise}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 健康建议 -->
+    <view wx:if="{{healthAdvices.length > 0}}" class="advice-section">
+      <view class="section-title">健康建议</view>
+      
+      <view class="advice-list">
+        <view wx:for="{{healthAdvices}}" wx:key="id" class="advice-item">
+          <view class="advice-header">
+            <view class="advice-icon">💡</view>
+            <text class="advice-title">{{item.title}}</text>
+            <text class="advice-time">周期性建议</text>
+          </view>
+          <text class="advice-content">{{item.content}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 目标对比 -->
+    <view wx:if="{{healthGoals}}" class="goals-section">
+      <view class="section-title">目标达成情况</view>
+      
+      <view class="goals-comparison">
+        <view class="goal-item">
+          <view class="goal-info">
+            <text class="goal-label">每日饮水目标</text>
+            <text class="goal-target">{{healthGoals.dailyWaterIntake}}ml</text>
+          </view>
+          <view class="goal-actual">
+            <text class="actual-label">平均实际</text>
+            <text class="actual-value">{{averageStats.avgWater}}ml</text>
+          </view>
+        </view>
+        
+        <view class="goal-item">
+          <view class="goal-info">
+            <text class="goal-label">每日运动目标</text>
+            <text class="goal-target">{{healthGoals.dailyExerciseDuration}}分钟</text>
+          </view>
+          <view class="goal-actual">
+            <text class="actual-label">平均实际</text>
+            <text class="actual-value">{{averageStats.avgExercise}}分钟</text>
+          </view>
+        </view>
+        
+        <view class="goal-item">
+          <view class="goal-info">
+            <text class="goal-label">每日热量范围</text>
+            <text class="goal-target">{{healthGoals.dailyCalorieMin}}-{{healthGoals.dailyCalorieMax}}kcal</text>
+          </view>
+          <view class="goal-actual">
+            <text class="actual-label">平均实际</text>
+            <text class="actual-value">{{averageStats.avgCalories}}kcal</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 数据操作 -->
+    <view class="actions-section">
+      <view class="section-title">数据管理</view>
+      
+      <view class="action-buttons">
+        <button class="action-btn export-btn" bindtap="exportData">
+          <text class="btn-icon">📤</text>
+          <text class="btn-text">导出数据</text>
+        </button>
+        
+        <button class="action-btn share-btn" open-type="share">
+          <text class="btn-icon">📱</text>
+          <text class="btn-text">分享数据</text>
+        </button>
+      </view>
+    </view>
+
+
+      </view>
+  </view>
+</scroll-view>
