@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康习惯打卡小程序 - Web预览</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .phone-container {
+            max-width: 375px;
+            margin: 20px auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            padding: 44px 20px 20px;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+        
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 44px;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+        .title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .login-section {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .app-logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .app-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .app-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+            display: block;
+        }
+        
+        .login-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .mock-btn {
+            background: #2196F3;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: #4CAF50;
+            border-bottom-color: #4CAF50;
+        }
+        
+        .section {
+            background: white;
+            margin: 10px 0;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-icon {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: #f8f9fa;
+            border: none;
+            padding: 20px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .btn-icon {
+            font-size: 30px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .btn-text {
+            font-size: 12px;
+            color: #333;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            margin-right: 15px;
+            background: #ddd;
+        }
+        
+        .user-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .user-bmi {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .today-complete {
+            margin-left: auto;
+            text-align: center;
+        }
+        
+        .complete-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .complete-label {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .save-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .cancel-btn {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+        }
+        
+        .menu-icon {
+            font-size: 20px;
+            margin-right: 15px;
+        }
+        
+        .menu-text {
+            flex: 1;
+            font-size: 16px;
+        }
+        
+        .menu-arrow {
+            color: #ccc;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- 导航栏 -->
+        <div class="header">
+            <span class="back-btn">‹</span>
+            <span class="title" id="pageTitle">健康打卡</span>
+        </div>
+        
+        <!-- 首页内容 -->
+        <div id="homePage" class="content">
+            <div class="user-info">
+                <div class="user-avatar"></div>
+                <div>
+                    <div class="user-name">测试用户</div>
+                    <div class="user-bmi">BMI: 22.0 (正常)</div>
+                </div>
+                <div class="today-complete">
+                    <div class="complete-text">1/3</div>
+                    <div class="complete-label">今日完成</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">今日进度</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon">💧</div>
+                        <div class="stat-value">1200ml</div>
+                        <div class="stat-label">饮水</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🍽️</div>
+                        <div class="stat-value">1800kcal</div>
+                        <div class="stat-label">饮食</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🏃</div>
+                        <div class="stat-value">30min</div>
+                        <div class="stat-label">运动</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">快捷打卡</div>
+                <div class="quick-actions">
+                    <button class="action-btn">
+                        <span class="btn-icon">💧</span>
+                        <span class="btn-text">饮水打卡</span>
+                    </button>
+                    <button class="action-btn">
+                        <span class="btn-icon">🍽️</span>
+                        <span class="btn-text">饮食记录</span>
+                    </button>
+                    <button class="action-btn">
+                        <span class="btn-icon">🏃</span>
+                        <span class="btn-text">运动打卡</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 数据中心页面 -->
+        <div id="dataPage" class="content hidden">
+            <div class="section">
+                <div class="section-title">本周健康概览</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon">💧</div>
+                        <div class="stat-value">8.4k</div>
+                        <div class="stat-label">总饮水量</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-value">12.6k</div>
+                        <div class="stat-label">总热量摄入</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🏃</div>
+                        <div class="stat-value">210</div>
+                        <div class="stat-label">总运动时长</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">每日详情</div>
+                <div style="text-align: center; color: #666; padding: 20px;">
+                    暂无历史数据，完成今日打卡后即可查看统计
+                </div>
+            </div>
+        </div>
+        
+        <!-- 我的页面 -->
+        <div id="profilePage" class="content hidden">
+            <div class="section">
+                <div class="section-title">基础健康信息</div>
+                <div class="form-group">
+                    <label class="form-label">身高 (cm)</label>
+                    <input type="number" class="form-input" placeholder="请输入身高" value="170">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">体重 (kg)</label>
+                    <input type="number" class="form-input" placeholder="请输入体重" value="65">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">年龄</label>
+                    <input type="number" class="form-input" placeholder="请输入年龄" value="25">
+                </div>
+                <div class="form-actions">
+                    <button class="cancel-btn">取消</button>
+                    <button class="save-btn">保存</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="menu-item">
+                    <span class="menu-icon">📊</span>
+                    <span class="menu-text">数据中心</span>
+                    <span class="menu-arrow">›</span>
+                </div>
+                <div class="menu-item">
+                    <span class="menu-icon">⚙️</span>
+                    <span class="menu-text">提醒设置</span>
+                    <span class="menu-arrow">›</span>
+                </div>
+                <div class="menu-item">
+                    <span class="menu-icon">📤</span>
+                    <span class="menu-text">数据导出</span>
+                    <span class="menu-arrow">›</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部导航 -->
+        <div class="nav-tabs">
+            <div class="tab active" onclick="showPage('home')">首页</div>
+            <div class="tab" onclick="showPage('data')">数据中心</div>
+            <div class="tab" onclick="showPage('profile')">我的</div>
+        </div>
+    </div>
+    
+    <script>
+        function showPage(page) {
+            // 隐藏所有页面
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('dataPage').classList.add('hidden');
+            document.getElementById('profilePage').classList.add('hidden');
+            
+            // 显示选中的页面
+            document.getElementById(page + 'Page').classList.remove('hidden');
+            
+            // 更新标题
+            const titles = {
+                'home': '健康打卡',
+                'data': '数据中心', 
+                'profile': '我的'
+            };
+            document.getElementById('pageTitle').textContent = titles[page];
+            
+            // 更新导航状态
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        // 模拟登录
+        document.querySelectorAll('.login-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                alert('模拟登录成功！这是微信小程序的web预览版本。');
+                showPage('home');
+            });
+        });
+    </script>
+</body>
+</html>
